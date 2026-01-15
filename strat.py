@@ -33,22 +33,22 @@ for i in range(3, 100):
     else:
         Foo[i].append(0)
 
-for i in range(3, 99):
-    if Foo[i][5] == 1:
-        Foo[i].append(Foo[i+1][2]-Foo[i][2])
+for i in range(4, 100):
+    if Foo[i-1][5] == 1:
+        Foo[i].append(Foo[i][3] + 1)
     else:
         Foo[i].append(0)
-Foo[99].append(0)
 
 with open("3_Day.csv", "w", newline="", encoding="utf-8") as file:
     writer = csv.writer(file)
     writer.writerows(Foo)
 
-returns = 0
-for i in range(3, 100):
-    returns += Foo[i][6]
+returns = 1
+for i in range(4, 100):
+    if Foo[i][6] > 0:
+        returns *= Foo[i][6]
 
-annualized_return = (returns * 365 / 100)
+annualized_return = returns ** 3.65
 
 print("3 Day Moving Average", returns, "Annualized Return:", annualized_return)
 
