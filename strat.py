@@ -1,6 +1,7 @@
 import requests
 import csv
 import numpy as np
+import scipy.stats as stats
 
 # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
 url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=IBM&apikey=demo'
@@ -50,6 +51,6 @@ for i in range(4, 100):
 
 annualized_return = returns ** 3.65
 
-print("3 Day Moving Average", returns, "Annualized Return:", annualized_return)
+print("3 Day Moving Average", returns - 1, "Annualized Return:", annualized_return - 1)
 
 
