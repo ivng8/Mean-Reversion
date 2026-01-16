@@ -68,6 +68,11 @@ def t_test(data, maN):
     print("T-stat:", t_stat)
     print("P-value:", p_value)
 
+def grids(maN, k):
+    Fook = ma_app(maN)
+    buy_tick(Fook, maN, k)
+    
+
 export("Base.csv", Foo)
 
 Foo3 = ma_app(3)
