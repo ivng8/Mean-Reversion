@@ -20,75 +20,67 @@ Foo.reverse()
 for i in range(1, 100):
     Foo[i].append(np.log(Foo[i][2]) - np.log(Foo[i-1][2]))
 
-ma = []
-for i in range(100):
-    ma.append(Foo[i][2])
-    if i > 2:
-        ma.pop(0)
-    if i > 1:
-        Foo[i].append(np.mean(ma))
+def export(fileName, data):
+    with open(fileName, "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+
+def ma_app(maN):
+    FooN = Foo.copy()
+
+    ma = []
+    for i in range(100):
+        ma.append(FooN[i][2])
+        if i > maN - 1:
+            ma.pop(0)
+        if i > maN - 2:
+            FooN[i].append(np.mean(ma))
     
-for i in range(3, 100):
-    if Foo[i][2] > Foo[i-1][4]:
-        Foo[i].append(1)
-    else:
-        Foo[i].append(0)
+    return FooN
 
-for i in range(4, 100):
-    if Foo[i-1][5] == 1:
-        Foo[i].append(Foo[i][3])
-    else:
-        Foo[i].append(0)
+def buy_tick(data, maN, k):
+    for i in range(maN, 100):
+        if data[i][2] - data[i-1][4] > k:
+            data[i].append(1)
+        else:
+            data[i].append(0)
 
-with open("3_Day.csv", "w", newline="", encoding="utf-8") as file:
-    writer = csv.writer(file)
-    writer.writerows(Foo)
+    for i in range(maN + 1, 100):
+        if data[i-1][5] == 1:
+            data[i].append(data[i][3])
+        else:
+            data[i].append(0)
 
-returns = 1
-for i in range(4, 100):
-    returns *= (Foo[i][6] + 1)
+def return_p(data, maN):
+    returns = 1
+    for i in range(maN + 1, 100):
+        returns *= (data[i][6] + 1)
+    annualized_return = returns ** 3.65
+    return returns - 1, annualized_return - 1
 
-annualized_return = returns ** 3.65
+def t_test(data, maN):
+    daily_p_returns = []
+    for i in range(maN + 1, 100):
+        if data[i][6] != 0:
+            daily_p_returns.append(data[i][6])
 
-print("3 Day Moving Average", returns - 1, "Annualized Return:", annualized_return - 1)
+    t_stat, p_value = stats.ttest_1samp(daily_p_returns, 0)
+    print("T-stat:", t_stat)
+    print("P-value:", p_value)
 
-daily_p_returns = []
-for i in range(4, 100):
-    if Foo[i][6] != 0:
-        daily_p_returns.append(Foo[i][6])
+export("Base.csv", Foo)
 
-t_stat, p_value = stats.ttest_1samp(daily_p_returns, 0)
-print("T-stat:", t_stat)
-print("P-value:", p_value)
+Foo3 = ma_app(3)
+buy_tick(Foo3, 3, 0.0)
+export("3_Day.csv", Foo3)
+returns, annualized_return = return_p(Foo3, 3)
+print("3 Day Moving Average", returns, "Annualized Return:", annualized_return)
+t_test(Foo3, 3)
 
-ma = []
-for i in range(100):
-    ma.append(Foo[i][2])
-    if i > 4:
-        ma.pop(0)
-    if i > 3:
-        Foo[i].append(np.mean(ma))
-    
-for i in range(5, 100):
-    if Foo[i][2] > Foo[i-1][7]:
-        Foo[i].append(1)
-    else:
-        Foo[i].append(0)
+Foo5 = ma_app(5)
+buy_tick(Foo5, 5, 0.0)
+export("5_Day.csv", Foo5)
+returns, annualized_return = return_p(Foo5, 5)
+print("5 Day Moving Average", returns, "Annualized Return:", annualized_return)
+t_test(Foo5, 5)
 
-for i in range(6, 100):
-    if Foo[i-1][8] == 1:
-        Foo[i].append(Foo[i][3])
-    else:
-        Foo[i].append(0)
-
-with open("5_Day.csv", "w", newline="", encoding="utf-8") as file:
-    writer = csv.writer(file)
-    writer.writerows(Foo)
-
-returns = 1
-for i in range(6, 100):
-    returns *= (Foo[i][9] + 1)
-
-annualized_return = returns ** 3.65
-
-print("5 Day Moving Average", returns - 1, "Annualized Return:", annualized_return - 1)
